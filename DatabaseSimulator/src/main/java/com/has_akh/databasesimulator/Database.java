@@ -1,7 +1,9 @@
 package com.has_akh.databasesimulator;
 
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -25,8 +27,20 @@ public class Database {
         
     }
     
-    public void getTable(String name) {
-        
+    public Relation getTable(String name) {
+        try {
+            for (int i = 0; i < tables.size(); i++) {
+                Relation thisTable = tables.get(i);
+                if (thisTable.getName().equalsIgnoreCase(name)) {
+                    return thisTable;
+                }
+            }
+            throw new NoSuchElementException(name + "Table not found in the Database!");
+        } catch (NoSuchElementException e) {
+            e.printStackTrace();
+            Relation emptyTable = new Relation("None", new ArrayList<>());
+            return emptyTable;
+        }
     }
     
     public void commitDB() {

@@ -44,4 +44,8 @@ public class Relation {
     public void select(Predicate<Tuple> condition) {
         
     }
+    
+    public String getName() {
+        return name;
+    }
 }
