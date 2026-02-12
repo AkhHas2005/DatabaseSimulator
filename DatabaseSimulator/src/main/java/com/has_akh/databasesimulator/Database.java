@@ -18,8 +18,11 @@ public class Database {
     private List<Relation> tables;
     private String fileName; 
     
-    public void createTable(String name, List<Attribute> schema) {
+    public void createTable(String name, List<Attribute> schema, String data) {
         Relation newTable = new Relation(name, schema);
+        if (!data.isBlank()) {
+            //Here data will be transformed into tuples to be added to the table
+        }
         tables.add(newTable);
     }
     
