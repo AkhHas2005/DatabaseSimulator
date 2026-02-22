@@ -1,6 +1,6 @@
 package com.has_akh.databasesimulator;
 
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -27,14 +27,19 @@ public class Relation {
     public Relation(String name, List<Attribute> columns) {
         this.name = name;
         this.columns = columns;
+        this.records = new ArrayList<>();
     }
     
     public void insert(Tuple tuple){
-        
+        records.add(tuple);
     }
     
-    public void delete(Predicate<Tuple> condition) {
-        
+    public void delete(String primaryKey) {
+        for (int i = 0; i < records.size(); i++) {
+            if (records.get(i).getPrimaryKey().equalsIgnoreCase(primaryKey)) {
+                records.remove(i);
+            }
+        }
     }
     
     public void update(Predicate<Tuple> condition, Map<String, Object> newValues) {

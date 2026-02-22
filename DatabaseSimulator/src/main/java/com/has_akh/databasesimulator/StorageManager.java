@@ -102,13 +102,14 @@ public class StorageManager {
                 String[] values = row.split(",");
 
                 Map<String, Object> tupleValues = new HashMap<>();
+                String primaryKey = "";
                 for (int i = 0; i < schema.size(); i++) {
                     Attribute attr = schema.get(i);
                     Object parsedValue = parseValue(values[i], attr.getType());
                     tupleValues.put(attr.getName(), parsedValue);
                 }
 
-                table.insert(new Tuple(tupleValues));
+                table.insert(new Tuple(tupleValues, primaryKey));
             }
         }
 

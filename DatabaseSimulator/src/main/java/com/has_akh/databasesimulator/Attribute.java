@@ -21,7 +21,7 @@ class Attribute {
     private String name;
     private DataType type;
     
-    public void Attribute(String name, DataType type) {
+    public Attribute(String name, DataType type) {
         this.name = name;
         this.type = type;
     }
