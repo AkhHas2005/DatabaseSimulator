@@ -62,4 +62,21 @@ public class Relation {
     public String getName() {
         return name;
     }
+
+    public List<Attribute> getColumns() {
+        return columns;
+    }
+
+    public List<Tuple> getRecords() {
+        return records;
+    }
+
+    public Attribute getAttribute(String columnName) {
+        for (Attribute attr : columns) {
+            if (attr.getName().equals(columnName)) {
+                return attr;
+            }
+        }
+        throw new IllegalArgumentException("Column not found: " + columnName);
+    }
 }

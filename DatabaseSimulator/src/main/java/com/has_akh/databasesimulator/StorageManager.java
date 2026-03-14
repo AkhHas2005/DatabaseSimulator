@@ -7,6 +7,8 @@ import java.util.ArrayList; // Import the ArrayList and List classes
 import java.util.List; // These will handle the schema for a DB table
 import java.io.File;                  // Import the File class
 import java.io.FileNotFoundException; // Import this class to handle errors
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner; // Import Scanner as well for reading text files
@@ -30,11 +32,44 @@ public class StorageManager {
 
     public StorageManager(String filename) {
         this.filename = filename;
-        this.db = new Database();
+        this.db = new Database(filename);
     }
 
     public void saveTable(Relation table) {
+        StringBuilder sb = new StringBuilder();
 
+        sb.append("{").append(table.getName()).append(": ");
+
+        // 1. Schema
+        List<Attribute> columns = table.getColumns();
+        for (int i = 0; i < columns.size(); i++) {
+            Attribute attr = columns.get(i);
+            sb.append(attr.getName()).append("/").append(attr.getType());
+            if (i < columns.size() - 1) {
+                sb.append(",");
+            }
+        }
+
+        sb.append(";");
+
+        // 2. Data rows
+        for (Tuple tuple : table.getRecords()) {
+            List<String> rowValues = new ArrayList<>();
+            for (Attribute attr : columns) {
+                Object value = tuple.get(attr.getName());
+                rowValues.add(value.toString());
+            }
+            sb.append(String.join(",", rowValues)).append(";");
+        }
+
+        sb.append("}");
+
+        // 3. Write to file
+        try (FileWriter writer = new FileWriter(filename)) {
+            writer.write(sb.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private String readFile() {
@@ -130,6 +165,8 @@ public class StorageManager {
                 Float.parseFloat(raw);
             case BOOLEAN ->
                 Boolean.parseBoolean(raw);
+            case DECIMAL ->
+                Double.parseDouble(raw);
             default ->
                 raw; // STRING
         };
