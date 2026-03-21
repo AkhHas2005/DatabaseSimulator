@@ -157,4 +157,20 @@ public class Database {
             storageManager.saveTable(table);
         }
     }
+    
+    public void setTables(List<Relation> tables) {
+        this.tables = tables;
+    }
+    
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+    
+    public String getFileName() {
+        return fileName;
+    }
+    
+    public List<Relation> getTables() {
+        return tables;
+    }
 }

@@ -21,9 +21,12 @@ import java.util.regex.Pattern;
  */
 /**
  *
- * @author Hasan Akhtar Handles saving/loading tables to/from text files.
- * Responsibilities: - Serialize relations to disk - Deserialize them back into
- * memory - Manage file naming conventions
+ * @author Hasan Akhtar 
+ * Handles saving/loading tables to/from text files.
+ * Responsibilities: 
+ * - Serialize relations to disk 
+ * - Deserialize them back into memory 
+ * - Manage file naming conventions
  */
 public class StorageManager {
 
@@ -36,11 +39,12 @@ public class StorageManager {
     }
 
     public void saveTable(Relation table) {
+        // 1. Build the serialized table string
         StringBuilder sb = new StringBuilder();
 
         sb.append("{").append(table.getName()).append(": ");
 
-        // 1. Schema
+        // Schema
         List<Attribute> columns = table.getColumns();
         for (int i = 0; i < columns.size(); i++) {
             Attribute attr = columns.get(i);
@@ -52,7 +56,7 @@ public class StorageManager {
 
         sb.append(";");
 
-        // 2. Data rows
+        // Data rows
         for (Tuple tuple : table.getRecords()) {
             List<String> rowValues = new ArrayList<>();
             for (Attribute attr : columns) {
@@ -64,9 +68,42 @@ public class StorageManager {
 
         sb.append("}");
 
-        // 3. Write to file
+        String newTableLine = sb.toString();
+
+        // 2. Read existing file lines
+        List<String> lines = new ArrayList<>();
+        File file = new File(filename);
+
+        if (file.exists()) {
+            try (Scanner sc = new Scanner(file)) {
+                while (sc.hasNextLine()) {
+                    lines.add(sc.nextLine());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // 3. Check if table already exists
+        boolean replaced = false;
+        for (int i = 0; i < lines.size(); i++) {
+            if (lines.get(i).startsWith("{" + table.getName() + ":")) {
+                lines.set(i, newTableLine);
+                replaced = true;
+                break;
+            }
+        }
+
+        // 4. If not replaced, append new table
+        if (!replaced) {
+            lines.add(newTableLine);
+        }
+
+        // 5. Rewrite entire file
         try (FileWriter writer = new FileWriter(filename)) {
-            writer.write(sb.toString());
+            for (String line : lines) {
+                writer.write(line + System.lineSeparator());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -99,20 +136,30 @@ public class StorageManager {
             throw new IllegalArgumentException("Invalid table format: missing table name.");
         }
 
-        // 2. Extract schema block
+        // 2. Extract table block
+        Pattern tableBlockPattern = Pattern.compile("\\{" + tableName + ":(.*?)\\}", Pattern.DOTALL);
+        Matcher blockMatcher = tableBlockPattern.matcher(fileContents);
+
+        if (!blockMatcher.find()) {
+            throw new IllegalArgumentException("Table not found: " + tableName);
+        }
+
+        String tableBlock = blockMatcher.group(1);
+
+        // 3. Extract schema block
         Pattern schemaPattern = Pattern.compile(":(.*?)\\;");
-        Matcher schemaMatcher = schemaPattern.matcher(fileContents);
+        Matcher schemaMatcher = schemaPattern.matcher(tableBlock);
         if (!schemaMatcher.find()) {
             throw new IllegalArgumentException("Invalid table format: missing schema.");
         }
         String schemaBlock = schemaMatcher.group(1);
 
-        // 3. Extract data block
+        // 4. Extract data block
         Pattern dataPattern = Pattern.compile("\\;(.*)\\}");
         Matcher dataMatcher = dataPattern.matcher(fileContents);
         String dataBlock = dataMatcher.find() ? dataMatcher.group(1) : "";
 
-        // 4. Parse schema into Attribute objects
+        // 5. Parse schema into Attribute objects
         List<Attribute> schema = new ArrayList<>();
         Pattern attributePattern = Pattern.compile("(\\w+)\\/(\\w+)");
         Matcher attributeMatcher = attributePattern.matcher(schemaBlock);
@@ -125,11 +172,11 @@ public class StorageManager {
             schema.add(new Attribute(attrName, type));
         }
 
-        // 5. Create table in DB
+        // 6. Create table in DB
         db.createTable(tableName, schema, dataBlock);
         Relation table = db.getTable(tableName);
 
-        // 6. Parse data rows into Tuples
+        // 7. Parse data rows into Tuples
         if (!dataBlock.isBlank()) {
             String[] rows = dataBlock.split("\\;");
 
@@ -153,10 +200,25 @@ public class StorageManager {
     }
 
     public void loadAllTables() {
+        String fileContents = readFile();
 
+        // Find all occurrences of {TableName: ...}
+        Pattern tablePattern = Pattern.compile("\\{(\\w+):");
+        Matcher matcher = tablePattern.matcher(fileContents);
+
+        List<String> tableNames = new ArrayList<>();
+
+        while (matcher.find()) {
+            tableNames.add(matcher.group(1));
+        }
+
+        for (String tableName : tableNames) {
+            Relation loadedTable = loadTable(tableName);
+            System.out.println(loadedTable.getName() + " loaded successfully!");
+        }
     }
 
-// Helper to convert string → correct datatype
+    // Helper to convert string → correct datatype
     private Object parseValue(String raw, DataType type) {
         return switch (type) {
             case INTEGER ->
