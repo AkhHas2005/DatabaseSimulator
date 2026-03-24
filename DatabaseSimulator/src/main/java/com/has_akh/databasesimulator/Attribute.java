@@ -1,43 +1,68 @@
 package com.has_akh.databasesimulator;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
 /**
- *
- * @author Hasan Akhtar
- * 
  * Represents a column in a table.
  * Responsibilities:
  * - Store name and data type
  * - Provide validation
- * Fields:
- * @param String name
- * @param DataType type
+ * 
+ * Fields (Private attributes):
+ * String name - name of the attribute within the database schema
+ * DataType type - data type that any values associated with the attribute will take
+ * 
+ * This class models a single attribute (column) in a database relation.
+ * Each attribute has a name and a defined data type, which is used to
+ * validate values inserted into tuples belonging to the relation.
+ * 
+ * @author Hasan Akhtar
  */
 class Attribute {
     private String name;
     private DataType type;
-    
+
+    /**
+     * Constructs a new Attribute with the specified name and data type.
+     *
+     * @param name the name of the attribute (column name)
+     * @param type the data type associated with this attribute
+     */
     public Attribute(String name, DataType type) {
         this.name = name;
         this.type = type;
     }
-    
+
+    /**
+     * Updates the name of this attribute.
+     *
+     * @param newName the new name to assign to the attribute
+     */
     public void setName(String newName) {
         this.name = newName;
     }
-    
+
+    /**
+     * Retrieves the name of this attribute.
+     *
+     * @return the attribute's name
+     */
     public String getName() {
         return this.name;
     }
-    
+
+    /**
+     * Updates the data type of this attribute.
+     *
+     * @param newType the new data type to assign to the attribute
+     */
     public void setType(DataType newType) {
         this.type = newType;
     }
-    
+
+    /**
+     * Retrieves the data type of this attribute.
+     *
+     * @return the attribute's data type
+     */
     public DataType getType() {
         return this.type;
     }

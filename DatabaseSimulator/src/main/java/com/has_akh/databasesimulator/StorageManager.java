@@ -3,41 +3,57 @@ package com.has_akh.databasesimulator;
 import static com.has_akh.databasesimulator.DataType.BOOLEAN;
 import static com.has_akh.databasesimulator.DataType.FLOAT;
 import static com.has_akh.databasesimulator.DataType.INTEGER;
-import java.util.ArrayList; // Import the ArrayList and List classes
-import java.util.List; // These will handle the schema for a DB table
-import java.io.File;                  // Import the File class
-import java.io.FileNotFoundException; // Import this class to handle errors
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner; // Import Scanner as well for reading text files
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 /**
+ * Handles saving and loading tables to and from text files.
  *
- * @author Hasan Akhtar 
- * Handles saving/loading tables to/from text files.
- * Responsibilities: 
- * - Serialize relations to disk 
- * - Deserialize them back into memory 
- * - Manage file naming conventions
+ * Responsibilities:
+ * - Serialize relations to disk
+ * - Deserialize them back into memory
+ * - Manage file naming conventions and multi‑table storage
+ *
+ * Each table is stored as a single line in the database file using a custom format:
+ *     {TableName: col1/TYPE,col2/TYPE;value1,value2;value1,value2;}
+ *
+ * The StorageManager acts as the persistence layer for the Database class.
+ * It reads and writes table definitions, reconstructs schemas, and rebuilds
+ * tuples when loading from disk.
+ *
+ * @author Hasan Akhtar
  */
 public class StorageManager {
 
     private Database db;
     private String filename;
 
+    /**
+     * Constructs a StorageManager bound to a specific database file.
+     * A new Database instance is created internally to store loaded tables.
+     *
+     * @param filename the file used to store all tables in this database
+     */
     public StorageManager(String filename) {
         this.filename = filename;
         this.db = new Database(filename);
     }
 
+    /**
+     * Saves a table to disk. If the table already exists in the file,
+     * its line is replaced; otherwise, a new line is appended.
+     *
+     * @param table the relation to serialize and persist
+     */
     public void saveTable(Relation table) {
         // 1. Build the serialized table string
         StringBuilder sb = new StringBuilder();
@@ -109,11 +125,16 @@ public class StorageManager {
         }
     }
 
+    /**
+     * Reads the entire database file into a single string.
+     * Used internally for parsing table blocks.
+     *
+     * @return the full file contents as a string
+     */
     private String readFile() {
         File myObj = new File(filename);
         String data = "";
 
-        // try-with-resources: Scanner will be closed automatically
         try (Scanner myReader = new Scanner(myObj)) {
             while (myReader.hasNextLine()) {
                 data += myReader.nextLine();
@@ -125,11 +146,20 @@ public class StorageManager {
         return data;
     }
 
+    /**
+     * Loads a single table from the database file by name.
+     * The method extracts the table block, parses the schema,
+     * reconstructs tuples, and inserts them into the internal Database.
+     *
+     * @param tableName the name of the table to load
+     * @return the reconstructed Relation object
+     * @throws IllegalArgumentException if the table format is invalid or missing
+     */
     public Relation loadTable(String tableName) {
         String fileContents = readFile();
         String data = "";
 
-        // 1. Extract table name
+        // 1. Extract table name (basic validation)
         Pattern tableNamePattern = Pattern.compile("\\{(\\w+):");
         Matcher tableNameMatcher = tableNamePattern.matcher(fileContents);
         if (!tableNameMatcher.find()) {
@@ -199,10 +229,14 @@ public class StorageManager {
         return db.getTable(tableName);
     }
 
+    /**
+     * Loads all tables stored in the database file.
+     * Each table is identified by scanning for occurrences of "{TableName:".
+     * Loaded tables are inserted into the internal Database instance.
+     */
     public void loadAllTables() {
         String fileContents = readFile();
 
-        // Find all occurrences of {TableName: ...}
         Pattern tablePattern = Pattern.compile("\\{(\\w+):");
         Matcher matcher = tablePattern.matcher(fileContents);
 
@@ -218,19 +252,20 @@ public class StorageManager {
         }
     }
 
-    // Helper to convert string → correct datatype
+    /**
+     * Converts a raw string into the appropriate Java type based on the DataType.
+     *
+     * @param raw  the raw string value
+     * @param type the expected data type
+     * @return the parsed value as an Object
+     */
     private Object parseValue(String raw, DataType type) {
         return switch (type) {
-            case INTEGER ->
-                Integer.parseInt(raw);
-            case FLOAT ->
-                Float.parseFloat(raw);
-            case BOOLEAN ->
-                Boolean.parseBoolean(raw);
-            case DECIMAL ->
-                Double.parseDouble(raw);
-            default ->
-                raw; // STRING
+            case INTEGER -> Integer.parseInt(raw);
+            case FLOAT -> Float.parseFloat(raw);
+            case BOOLEAN -> Boolean.parseBoolean(raw);
+            case DECIMAL -> Double.parseDouble(raw);
+            default -> raw; // STRING
         };
     }
 
