@@ -28,6 +28,7 @@ import java.util.function.Predicate;
 public class Relation {
 
     private String name;
+    private String primaryKey;
     private List<Attribute> columns;
     private List<Tuple> records;
 
@@ -36,11 +37,13 @@ public class Relation {
      *
      * @param name    the name of the table in the database
      * @param columns the list of attributes (column definitions) that form the schema
+     * @param primaryKey the uniquely identifying column in the table
      */
-    public Relation(String name, List<Attribute> columns) {
+    public Relation(String name, List<Attribute> columns, String primaryKey) {
         this.name = name;
         this.columns = columns;
         this.records = new ArrayList<>();
+        this.primaryKey = primaryKey;
     }
 
     /**
@@ -102,6 +105,15 @@ public class Relation {
      */
     public String getName() {
         return name;
+    }
+    
+    /**
+     * Retrieves the primary key of this relation.
+     *
+     * @return the primary key (uniquely identifying) column
+     */
+    public String getPrimaryKey() {
+        return primaryKey;
     }
 
     /**

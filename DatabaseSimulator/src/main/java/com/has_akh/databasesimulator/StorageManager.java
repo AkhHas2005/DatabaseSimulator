@@ -42,10 +42,11 @@ public class StorageManager {
      * A new Database instance is created internally to store loaded tables.
      *
      * @param filename the file used to store all tables in this database
+     * @param db the database already associated with the Storage Manager instance
      */
-    public StorageManager(String filename) {
+    public StorageManager(String filename, Database db) {
         this.filename = filename;
-        this.db = new Database(filename);
+        this.db = db;
     }
 
     /**
@@ -157,16 +158,8 @@ public class StorageManager {
      */
     public Relation loadTable(String tableName) {
         String fileContents = readFile();
-        String data = "";
 
-        // 1. Extract table name (basic validation)
-        Pattern tableNamePattern = Pattern.compile("\\{(\\w+):");
-        Matcher tableNameMatcher = tableNamePattern.matcher(fileContents);
-        if (!tableNameMatcher.find()) {
-            throw new IllegalArgumentException("Invalid table format: missing table name.");
-        }
-
-        // 2. Extract table block
+        // 1. Extract the full table block
         Pattern tableBlockPattern = Pattern.compile("\\{" + tableName + ":(.*?)\\}", Pattern.DOTALL);
         Matcher blockMatcher = tableBlockPattern.matcher(fileContents);
 
@@ -174,20 +167,32 @@ public class StorageManager {
             throw new IllegalArgumentException("Table not found: " + tableName);
         }
 
-        String tableBlock = blockMatcher.group(1);
+        String tableBlock = blockMatcher.group(1).trim();
 
-        // 3. Extract schema block
-        Pattern schemaPattern = Pattern.compile(":(.*?)\\;");
-        Matcher schemaMatcher = schemaPattern.matcher(tableBlock);
-        if (!schemaMatcher.find()) {
+        // 2. Extract schema (before first ;)
+        int firstSemicolon = tableBlock.indexOf(";");
+        if (firstSemicolon == -1) {
             throw new IllegalArgumentException("Invalid table format: missing schema.");
         }
-        String schemaBlock = schemaMatcher.group(1);
 
-        // 4. Extract data block
-        Pattern dataPattern = Pattern.compile("\\;(.*)\\}");
-        Matcher dataMatcher = dataPattern.matcher(fileContents);
-        String dataBlock = dataMatcher.find() ? dataMatcher.group(1) : "";
+        String schemaBlock = tableBlock.substring(0, firstSemicolon).trim();
+
+        // 3. Extract primary key (PK=columnName)
+        Pattern pkPattern = Pattern.compile("PK=(\\w+)");
+        Matcher pkMatcher = pkPattern.matcher(tableBlock);
+
+        if (!pkMatcher.find()) {
+            throw new IllegalArgumentException("Missing primary key definition.");
+        }
+
+        String primaryKey = pkMatcher.group(1);
+
+        // 4. Extract data block (everything after PK=...;)
+        String dataBlock = "";
+        int pkEnd = tableBlock.indexOf(";", firstSemicolon + 1);
+        if (pkEnd != -1 && pkEnd + 1 < tableBlock.length()) {
+            dataBlock = tableBlock.substring(pkEnd + 1).trim();
+        }
 
         // 5. Parse schema into Attribute objects
         List<Attribute> schema = new ArrayList<>();
@@ -202,32 +207,38 @@ public class StorageManager {
             schema.add(new Attribute(attrName, type));
         }
 
-        // 6. Create table in DB
-        db.createTable(tableName, schema, dataBlock);
-        Relation table = db.getTable(tableName);
+        // 6. Create the table using your updated constructor
+        Relation table = new Relation(tableName, schema, primaryKey);
 
         // 7. Parse data rows into Tuples
         if (!dataBlock.isBlank()) {
-            String[] rows = dataBlock.split("\\;");
+            String[] rows = dataBlock.split(";");
 
             for (String row : rows) {
+                if (row.isBlank()) continue;
+
                 String[] values = row.split(",");
 
                 Map<String, Object> tupleValues = new HashMap<>();
-                String primaryKey = "";
+                String pkValue = "";
+
                 for (int i = 0; i < schema.size(); i++) {
                     Attribute attr = schema.get(i);
-                    Object parsedValue = parseValue(values[i], attr.getType());
+                    Object parsedValue = parseValue(values[i].trim(), attr.getType());
                     tupleValues.put(attr.getName(), parsedValue);
+
+                    if (attr.getName().equals(primaryKey)) {
+                        pkValue = values[i].trim();
+                    }
                 }
 
-                table.insert(new Tuple(tupleValues, primaryKey));
+                table.insert(new Tuple(tupleValues, pkValue));
             }
         }
 
-        db.createTable(tableName, schema, data);
-        return db.getTable(tableName);
+        return table;
     }
+
 
     /**
      * Loads all tables stored in the database file.

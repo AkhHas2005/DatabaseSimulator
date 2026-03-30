@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public class Tuple {
 
-    private String primaryKey;
+    private Object primaryKey;
     private Map<String, Object> values;
 
     /**
@@ -30,7 +30,7 @@ public class Tuple {
      * @param initialValues a map containing attribute names and their associated values
      * @param primaryKey the unique identifier for this tuple
      */
-    public Tuple(Map<String, Object> initialValues, String primaryKey) {
+    public Tuple(Map<String, Object> initialValues, Object primaryKey) {
         values = initialValues;
         this.primaryKey = primaryKey;
     }
@@ -58,7 +58,7 @@ public class Tuple {
      *
      * @return the tuple's primary key
      */
-    public String getPrimaryKey() {
+    public Object getPrimaryKey() {
         return primaryKey;
     }
 

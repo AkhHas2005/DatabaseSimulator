@@ -1,6 +1,7 @@
 package com.has_akh.databasesimulator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -41,7 +42,7 @@ public class Database {
     public Database(String filename) {
         this.tables = new ArrayList<>();
         this.fileName = filename;
-        this.storageManager = new StorageManager(filename);
+        this.storageManager = new StorageManager(filename, this);
     }
 
     /**
@@ -51,14 +52,44 @@ public class Database {
      * @param name   the name of the new table
      * @param schema the list of attributes defining the table structure
      * @param data   raw data string to be parsed into tuples (optional)
+     * @param primaryKey column that will be the primary key in the table
      */
-    public void createTable(String name, List<Attribute> schema, String data) {
-        Relation newTable = new Relation(name, schema);
+    public void createTable(String name, List<Attribute> schema, String data, String primaryKey) {
+        Relation newTable = new Relation(name, schema, primaryKey);
+
         if (!data.isBlank()) {
-            // Here data will be transformed into tuples to be added to the table
+            String[] rows = data.split(";");
+
+            for (String row : rows) {
+                if (row.isBlank()) continue;
+
+                String[] values = row.split(",");
+
+                Map<String, Object> tupleValues = new HashMap<>();
+                String pkValue = "";
+
+                for (int i = 0; i < schema.size(); i++) {
+                    Attribute attr = schema.get(i);
+                    DataType type = attr.getType();
+
+                    // Parse the raw string into the correct Java type
+                    Object parsed = parseValue(values[i].trim(), type);
+
+                    tupleValues.put(attr.getName(), parsed);
+
+                    // Capture primary key value
+                    if (attr.getName().equals(primaryKey)) {
+                        pkValue = values[i].trim();
+                    }
+                }
+
+                newTable.insert(new Tuple(tupleValues, pkValue));
+            }
         }
+
         tables.add(newTable);
     }
+
 
     /**
      * Removes a table from the database.
@@ -223,7 +254,7 @@ public class Database {
             throw new NoSuchElementException(name + "Table not found in the Database!");
         } catch (NoSuchElementException e) {
             e.printStackTrace();
-            return new Relation("None", new ArrayList<>());
+            return new Relation("None", new ArrayList<>(), "None");
         }
     }
 
@@ -271,5 +302,9 @@ public class Database {
      */
     public List<Relation> getTables() {
         return tables;
+    }
+    
+    public StorageManager getStorageManagerInstance() {
+        return this.storageManager;
     }
 }
