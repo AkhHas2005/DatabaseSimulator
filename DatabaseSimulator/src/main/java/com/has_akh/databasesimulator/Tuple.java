@@ -1,5 +1,6 @@
 package com.has_akh.databasesimulator;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -34,6 +35,15 @@ public class Tuple {
         values = initialValues;
         this.primaryKey = primaryKey;
     }
+    
+    /**
+     * Constructs a new Tuple without specified initial values and primary key.
+     *
+     */
+    public Tuple() {
+        values = new HashMap();
+        primaryKey = "";
+    }
 
     /**
      * Replaces the entire set of values stored in this tuple.
@@ -60,6 +70,21 @@ public class Tuple {
      */
     public Object getPrimaryKey() {
         return primaryKey;
+    }
+    
+    /**
+     * Sets the value of the primary key associated with this tuple.
+     * Only designed for situations where the primary key hasn't been
+     * set when instantiating the tuple class, cannot be overwritten
+     *
+     * @param primaryKey the primary key of the attribute to set it to
+     */
+    public void setPrimaryKey(Object primaryKey) {
+        if (primaryKey.equals("")) {
+            this.primaryKey = primaryKey;
+        } else {
+            System.out.println("Primary key cannot be overwritten!");
+        }
     }
 
     /**

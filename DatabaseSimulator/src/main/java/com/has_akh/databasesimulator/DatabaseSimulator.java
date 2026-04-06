@@ -3,9 +3,15 @@
  */
 package com.has_akh.databasesimulator;
 
+import static com.has_akh.databasesimulator.DataType.BOOLEAN;
+import static com.has_akh.databasesimulator.DataType.DECIMAL;
+import static com.has_akh.databasesimulator.DataType.FLOAT;
+import static com.has_akh.databasesimulator.DataType.INTEGER;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -66,6 +72,7 @@ public class DatabaseSimulator {
 
     public static void handleChoice() {
         StorageManager storageForThisDB;
+        List<Attribute> schema;
         switch (choice) {
             case 1:
                 String filename = "test.txt";
@@ -100,7 +107,7 @@ public class DatabaseSimulator {
                 String tableName = keyboard.nextLine();
                 System.out.println("How many columns should the table have?");
                 int columns = keyboard.nextInt();
-                List<Attribute> schema = new ArrayList();
+                schema = new ArrayList();
                 String primaryKey = "";
                 DataType thisColumnType;
                 for (int i = 0; i < columns; i++) {
@@ -120,6 +127,32 @@ public class DatabaseSimulator {
                 System.out.println("Table added to database successfully\r\n");
                 break;
             case 5:
+//                private Object primaryKey;
+//    private Map<String, Object> values;
+                System.out.println("How many rows of data do you want to add?");
+                int rowsToAdd = keyboard.nextInt();
+                schema = currentTable.getColumns();
+                Map<String, Object> tupleValues;
+                String value;
+                DataType typeOfValue;
+                Tuple tuple = new Tuple();
+                for (int i = 0; i < rowsToAdd; i++) {
+                    tupleValues = new HashMap();
+                    for (Attribute column : schema) {
+                        if (column.getName().equalsIgnoreCase(currentTable.getPrimaryKey())) {
+                            System.out.println("Enter data value for primary key " + column.getName());
+                            value = keyboard.nextLine();
+                            typeOfValue = toDataType(value);
+                            tuple.setPrimaryKey(parseValue(value, typeOfValue));
+                        }
+                        System.out.println("Enter data value for " + column.getName());
+                        value = keyboard.nextLine();
+                        typeOfValue = toDataType(value);
+                        tupleValues.put(column.getName(), parseValue(value, typeOfValue));
+                    }
+                    tuple.setValues(tupleValues);
+                    currentTable.insert(tuple);
+                }
                 System.out.println("Data added to database table successfully\r\n");
                 break;
             case 6:
@@ -135,6 +168,23 @@ public class DatabaseSimulator {
                 System.out.println("Records selected (searched) successfully, these are the results:\r\n");
                 break;
         }
+    }
+    
+    /**
+     * Converts a raw string into the appropriate Java type based on the DataType.
+     *
+     * @param raw  the raw string value
+     * @param type the expected data type
+     * @return the parsed value as an Object
+     */
+    private static Object parseValue(String raw, DataType type) {
+        return switch (type) {
+            case INTEGER -> Integer.parseInt(raw);
+            case FLOAT -> Float.parseFloat(raw);
+            case BOOLEAN -> Boolean.parseBoolean(raw);
+            case DECIMAL -> Double.parseDouble(raw);
+            default -> raw; // STRING
+        };
     }
 
     /**
