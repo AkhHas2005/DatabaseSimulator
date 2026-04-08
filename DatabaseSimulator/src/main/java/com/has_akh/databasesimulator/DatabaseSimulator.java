@@ -127,8 +127,6 @@ public class DatabaseSimulator {
                 System.out.println("Table added to database successfully\r\n");
                 break;
             case 5:
-//                private Object primaryKey;
-//    private Map<String, Object> values;
                 System.out.println("How many rows of data do you want to add?");
                 int rowsToAdd = keyboard.nextInt();
                 schema = currentTable.getColumns();
@@ -156,9 +154,40 @@ public class DatabaseSimulator {
                 System.out.println("Data added to database table successfully\r\n");
                 break;
             case 6:
+                String thisTableName = currentTable.getName();
+                List<Attribute> tableColumns = currentTable.getColumns();
+                String thisColumnName;
+                int columnNumber;
+                Attribute thisAttribute;
+                for (int i = 0; i < tableColumns.size(); i++) {
+                    thisAttribute = tableColumns.get(i);
+                    System.out.println((i+1) + ". " + thisAttribute.getName());
+                }
+                System.out.println("Choose a column to update from the above list (enter the number)");
+                columnNumber = keyboard.nextInt();
+                thisColumnName = tableColumns.get(columnNumber).getName();
+                System.out.println("Enter the condition string (supports ==, !=, >, <, >=, <=)");
+                String thisCondition = keyboard.nextLine();
+                Map<String, Object> newValues = new HashMap();
+                thisDB.updateData(thisTableName, thisColumnName, thisCondition, newValues);
                 System.out.println("Records updated successfully\r\n");
                 break;
             case 7:
+                String currentTableName = currentTable.getName();
+                List<Attribute> currentTableColumns = currentTable.getColumns();
+                String currentColumnName;
+                int currentColumnNumber;
+                Attribute currentAttribute;
+                for (int i = 0; i < currentTableColumns.size(); i++) {
+                    currentAttribute = currentTableColumns.get(i);
+                    System.out.println((i+1) + ". " + currentAttribute.getName());
+                }
+                System.out.println("Choose a column to delete values from the above list (enter the number)");
+                currentColumnNumber = keyboard.nextInt();
+                currentColumnName = currentTableColumns.get(currentColumnNumber).getName();
+                System.out.println("Enter the condition string (supports ==, !=, >, <, >=, <=)");
+                String currentCondition = keyboard.nextLine();
+                thisDB.deleteData(currentTableName, currentColumnName, currentCondition);
                 System.out.println("Records deleted successfully\r\n");
                 break;
             case 8:
