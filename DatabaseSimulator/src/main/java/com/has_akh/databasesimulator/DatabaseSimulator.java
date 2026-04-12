@@ -184,6 +184,7 @@ public class DatabaseSimulator {
                 }
                 System.out.println("Choose a column to delete values from the above list (enter the number)");
                 currentColumnNumber = keyboard.nextInt();
+                keyboard.nextLine(); // consume leftover newline
                 currentColumnName = currentTableColumns.get(currentColumnNumber).getName();
                 System.out.println("Enter the condition string (supports ==, !=, >, <, >=, <=)");
                 String currentCondition = keyboard.nextLine();
@@ -191,12 +192,73 @@ public class DatabaseSimulator {
                 System.out.println("Records deleted successfully\r\n");
                 break;
             case 8:
-                System.out.println("Database table dropped (deleted) successfully\r\n");
+                String nameOfTable = currentTable.getName();
+                String dropThisTable = "";
+                String tableToDrop = "";
+                System.out.println("Do you want to drop (delete) this table (" + nameOfTable + ")?");
+                dropThisTable = keyboard.nextLine();
+                keyboard.nextLine(); // consume leftover newline
+                if (dropThisTable.equalsIgnoreCase("Yes") || dropThisTable.equalsIgnoreCase("Y")) {
+                    thisDB.dropTable(nameOfTable);
+                } else {
+                    tableToDrop = tryDropOtherTable();
+                    nameOfTable = tableToDrop;
+                }
+                System.out.println("Database table with name" + nameOfTable + "dropped (deleted) successfully\r\n");
                 break;
             case 9:
+                String tableToSearch = currentTable.getName();
+                List<Attribute> searchColumns = currentTable.getColumns();
+                String columnToSearch;
+                int searchColumnNumber;
+                Attribute searchAttribute;
+
+                // Display columns
+                for (int i = 0; i < searchColumns.size(); i++) {
+                    searchAttribute = searchColumns.get(i);
+                    System.out.println((i + 1) + ". " + searchAttribute.getName());
+                }
+
+                System.out.println("Choose a column to select (search) values from the above list (enter the number)");
+                searchColumnNumber = keyboard.nextInt();
+                keyboard.nextLine(); // consume leftover newline
+
+                columnToSearch = searchColumns.get(searchColumnNumber - 1).getName();
+
+                System.out.println("Enter the condition string (supports ==, !=, >, <, >=, <=)");
+                String searchCondition = keyboard.nextLine();
+
+                List<Tuple> searchData = thisDB.selectData(tableToSearch, columnToSearch, searchCondition);
+
                 System.out.println("Records selected (searched) successfully, these are the results:\r\n");
+
+                for (Tuple data : searchData) {
+                    System.out.println("Primary key (unique identifier) of row: " + data.getPrimaryKey());
+
+                    Map<String, Object> dataValues = data.getValues();
+
+                    // Display tuple values (in schema order)
+                    System.out.print("Values in row: ");
+                    for (Attribute attr : searchColumns) {
+                        Object thisValue = dataValues.get(attr.getName());
+                        System.out.print(thisValue + ", ");
+                    }
+                    System.out.println("\n");
+                }
                 break;
         }
+    }
+    
+    private static String tryDropOtherTable() {
+        String tableToDrop;
+        try {
+            System.out.println("Enter the name of the table to drop: ");
+            tableToDrop = keyboard.nextLine();
+        } catch (IllegalArgumentException e) {
+            System.out.println("That table doesn't exist, please choose a different name!");
+            tableToDrop = tryDropOtherTable();
+        }
+        return tableToDrop;
     }
     
     /**
