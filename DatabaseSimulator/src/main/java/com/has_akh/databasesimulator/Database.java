@@ -30,9 +30,9 @@ import java.util.function.Predicate;
  */
 public class Database {
 
-    private List<Relation> tables;
-    private String fileName;
-    private StorageManager storageManager;
+    private List<Relation> tables; //Originally included
+    private String fileName; //Originally included
+    private StorageManager storageManager; //Not included originally
 
     /**
      * Constructs a new Database instance backed by the specified file.
@@ -54,7 +54,7 @@ public class Database {
      * @param data   raw data string to be parsed into tuples (optional)
      * @param primaryKey column that will be the primary key in the table
      */
-    public void createTable(String name, List<Attribute> schema, String data, String primaryKey) {
+    public void createTable(String name, List<Attribute> schema, String data, String primaryKey) { //Originally included
         Relation newTable = new Relation(name, schema, primaryKey);
 
         if (!data.isBlank()) {
@@ -97,7 +97,7 @@ public class Database {
      * @param name the name of the table to drop
      * @throws IllegalArgumentException if the table does not exist
      */
-    public void dropTable(String name) {
+    public void dropTable(String name) { //Originally included
         Relation table = getTable(name);
         if (!table.getName().equals("None")) {
             tables.remove(table);
@@ -113,7 +113,7 @@ public class Database {
      * @param columnName the column used in the condition
      * @param condition  the condition string (supports ==, !=, >, <, >=, <=)
      */
-    public void deleteData(String tableName, String columnName, String condition) {
+    public void deleteData(String tableName, String columnName, String condition) { //Originally included
         Relation table = getTable(tableName);
         Attribute attr = table.getAttribute(columnName);
         DataType type = attr.getType();
@@ -131,7 +131,7 @@ public class Database {
      * @param type      the data type of the column
      * @return a predicate that evaluates the condition on a tuple
      */
-    private Predicate<Tuple> buildPredicate(String column, String condition, DataType type) {
+    private Predicate<Tuple> buildPredicate(String column, String condition, DataType type) { //Not included originally
 
         condition = condition.trim();
 
@@ -174,7 +174,7 @@ public class Database {
      * @return a negative, zero, or positive integer depending on comparison
      * @throws IllegalArgumentException if the values are not numeric
      */
-    private int compare(Object a, Object b) {
+    private int compare(Object a, Object b) { //Not included originally
         if (a instanceof Integer ai && b instanceof Integer bi) {
             return ai.compareTo(bi);
         }
@@ -194,7 +194,7 @@ public class Database {
      * @param type the expected data type
      * @return the parsed value as an Object
      */
-    private Object parseValue(String raw, DataType type) {
+    private Object parseValue(String raw, DataType type) { //Not included originally
         return switch (type) {
             case INTEGER -> Integer.parseInt(raw);
             case FLOAT -> Float.parseFloat(raw);
@@ -212,7 +212,7 @@ public class Database {
      * @param condition  the condition string
      * @return a list of tuples matching the condition
      */
-    public List<Tuple> selectData(String tableName, String columnName, String condition) {
+    public List<Tuple> selectData(String tableName, String columnName, String condition) { //Originally included
         Relation table = getTable(tableName);
         Attribute attr = table.getAttribute(columnName);
         DataType type = attr.getType();
@@ -229,7 +229,7 @@ public class Database {
      * @param condition  the condition string
      * @param newValues  a map of attribute names to updated values
      */
-    public void updateData(String tableName, String columnName, String condition, Map<String, Object> newValues) {
+    public void updateData(String tableName, String columnName, String condition, Map<String, Object> newValues) { //Originally included
         Relation table = getTable(tableName);
         Attribute attr = table.getAttribute(columnName);
         DataType type = attr.getType();
@@ -244,7 +244,7 @@ public class Database {
      * @param name the name of the table to retrieve
      * @return the matching Relation object, or a placeholder table if not found
      */
-    public Relation getTable(String name) {
+    public Relation getTable(String name) { //Originally included
         try {
             for (Relation thisTable : tables) {
                 if (thisTable.getName().equalsIgnoreCase(name)) {
@@ -262,7 +262,7 @@ public class Database {
      * Saves all tables in the database to disk by delegating to the StorageManager.
      * This acts as a commit operation for the in‑memory database state.
      */
-    public void commitDB() {
+    public void commitDB() { //Originally included
         for (Relation table : tables) {
             storageManager.saveTable(table);
         }
@@ -273,7 +273,7 @@ public class Database {
      *
      * @param tables the new list of relations
      */
-    public void setTables(List<Relation> tables) {
+    public void setTables(List<Relation> tables) { //Originally included
         this.tables = tables;
     }
 
@@ -282,7 +282,7 @@ public class Database {
      *
      * @param fileName the new filename
      */
-    public void setFileName(String fileName) {
+    public void setFileName(String fileName) { //Originally included
         this.fileName = fileName;
     }
 
@@ -291,7 +291,7 @@ public class Database {
      *
      * @return the database file name
      */
-    public String getFileName() {
+    public String getFileName() { //Originally included
         return fileName;
     }
 
@@ -300,11 +300,16 @@ public class Database {
      *
      * @return a list of relations
      */
-    public List<Relation> getTables() {
+    public List<Relation> getTables() { //Originally included
         return tables;
     }
     
-    public StorageManager getStorageManagerInstance() {
+    /**
+     * Retrieves the instance of StorageManager associated with this class.
+     *
+     * @return currently assigned instance of StorageManager class
+     */
+    public StorageManager getStorageManagerInstance() { //Not included originally
         return this.storageManager;
     }
 }

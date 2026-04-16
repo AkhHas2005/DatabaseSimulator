@@ -22,8 +22,8 @@ import java.util.Map;
  */
 public class Tuple {
 
-    private Object primaryKey;
-    private Map<String, Object> values;
+    private Object primaryKey; //Not included originally
+    private Map<String, Object> values; //Originally included
 
     /**
      * Constructs a new Tuple with the specified initial values and primary key.
@@ -50,7 +50,7 @@ public class Tuple {
      *
      * @param newValues a map of updated attribute-value pairs
      */
-    public void setValues(Map<String, Object> newValues) {
+    public void setValues(Map<String, Object> newValues) { //Originally included
         values = newValues;
     }
 
@@ -59,7 +59,7 @@ public class Tuple {
      *
      * @return a map containing attribute names and their corresponding values
      */
-    public Map<String, Object> getValues() {
+    public Map<String, Object> getValues() { //Originally included
         return values;
     }
 
@@ -68,7 +68,7 @@ public class Tuple {
      *
      * @return the tuple's primary key
      */
-    public Object getPrimaryKey() {
+    public Object getPrimaryKey() { //Not included originally
         return primaryKey;
     }
     
@@ -79,7 +79,7 @@ public class Tuple {
      *
      * @param primaryKey the primary key of the attribute to set it to
      */
-    public void setPrimaryKey(Object primaryKey) {
+    public void setPrimaryKey(Object primaryKey) { //Not included originally
         if (primaryKey.equals("")) {
             this.primaryKey = primaryKey;
         } else {
@@ -93,7 +93,7 @@ public class Tuple {
      * @param columnName the name of the attribute to retrieve
      * @return the value stored under the given column name, or null if not present
      */
-    public Object get(String columnName) {
+    public Object get(String columnName) { //Not included originally
         return values.get(columnName);
     }
 
@@ -103,7 +103,7 @@ public class Tuple {
      * @param columnName the name of the attribute to update
      * @param value the new value to assign to the attribute
      */
-    public void set(String columnName, Object value) {
+    public void set(String columnName, Object value) { //Not included originally
         values.put(columnName, value);
     }
 

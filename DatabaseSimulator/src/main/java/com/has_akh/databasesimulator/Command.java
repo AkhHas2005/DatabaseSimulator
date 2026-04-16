@@ -9,6 +9,6 @@ package com.has_akh.databasesimulator;
  *
  * @author Hasan Akhtar
  */
-public interface Command {
+public interface Command { //Not included originally
     void execute();
 }

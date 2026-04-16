@@ -22,6 +22,6 @@ package com.has_akh.databasesimulator;
  * 
  * @author Hasan Akhtar
  */
-public enum DataType {
+public enum DataType { //Originally included
     STRING, INTEGER, FLOAT, BOOLEAN, DECIMAL;
 }

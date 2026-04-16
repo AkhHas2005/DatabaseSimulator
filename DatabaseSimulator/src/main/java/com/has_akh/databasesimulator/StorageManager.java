@@ -34,8 +34,8 @@ import java.util.regex.Pattern;
  */
 public class StorageManager {
 
-    private Database db;
-    private String filename;
+    private Database db; //Originally included
+    private String filename; //Originally included
 
     /**
      * Constructs a StorageManager bound to a specific database file.
@@ -55,7 +55,7 @@ public class StorageManager {
      *
      * @param table the relation to serialize and persist
      */
-    public void saveTable(Relation table) {
+    public void saveTable(Relation table) { //Originally included
         // 1. Build the serialized table string
         StringBuilder sb = new StringBuilder();
 
@@ -156,7 +156,7 @@ public class StorageManager {
      * @return the reconstructed Relation object
      * @throws IllegalArgumentException if the table format is invalid or missing
      */
-    public Relation loadTable(String tableName) {
+    public Relation loadTable(String tableName) { //Originally included
         String fileContents = readFile();
 
         // 1. Extract the full table block
@@ -245,7 +245,7 @@ public class StorageManager {
      * Each table is identified by scanning for occurrences of "{TableName:".
      * Loaded tables are inserted into the internal Database instance.
      */
-    public void loadAllTables() {
+    public void loadAllTables() { //Not included originally
         String fileContents = readFile();
 
         Pattern tablePattern = Pattern.compile("\\{(\\w+):");
@@ -270,7 +270,7 @@ public class StorageManager {
      * @param type the expected data type
      * @return the parsed value as an Object
      */
-    private Object parseValue(String raw, DataType type) {
+    private Object parseValue(String raw, DataType type) { //Not included originally
         return switch (type) {
             case INTEGER -> Integer.parseInt(raw);
             case FLOAT -> Float.parseFloat(raw);

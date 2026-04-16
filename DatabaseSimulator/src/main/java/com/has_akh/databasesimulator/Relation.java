@@ -27,10 +27,10 @@ import java.util.function.Predicate;
  */
 public class Relation {
 
-    private String name;
-    private String primaryKey;
-    private List<Attribute> columns;
-    private List<Tuple> records;
+    private String name; //Originally included
+    private String primaryKey; //Originally included
+    private List<Attribute> columns; //Originally included
+    private List<Tuple> records; //Originally included
 
     /**
      * Constructs a new Relation with the specified name and schema.
@@ -51,7 +51,7 @@ public class Relation {
      *
      * @param tuple the tuple to be added to the table
      */
-    public void insert(Tuple tuple) {
+    public void insert(Tuple tuple) { //Originally included
         records.add(tuple);
     }
 
@@ -60,7 +60,7 @@ public class Relation {
      *
      * @param condition a predicate used to determine which tuples should be removed
      */
-    public void delete(Predicate<Tuple> condition) {
+    public void delete(Predicate<Tuple> condition) { //Originally included
         records.removeIf(condition);
     }
 
@@ -72,7 +72,7 @@ public class Relation {
      * @param condition a predicate used to determine which tuples should be updated
      * @param newValues a map of attribute names to new values to apply
      */
-    public void update(Predicate<Tuple> condition, Map<String, Object> newValues) {
+    public void update(Predicate<Tuple> condition, Map<String, Object> newValues) { //Originally included
         for (Tuple t : records) {
             if (condition.test(t)) {
                 for (Map.Entry<String, Object> entry : newValues.entrySet()) {
@@ -88,7 +88,7 @@ public class Relation {
      * @param condition a predicate used to filter tuples
      * @return a list of tuples matching the condition
      */
-    public List<Tuple> select(Predicate<Tuple> condition) {
+    public List<Tuple> select(Predicate<Tuple> condition) { //Originally included
         List<Tuple> result = new ArrayList<>();
         for (Tuple t : records) {
             if (condition.test(t)) {
@@ -103,7 +103,7 @@ public class Relation {
      *
      * @return the table name
      */
-    public String getName() {
+    public String getName() { //Originally included
         return name;
     }
     
@@ -112,7 +112,7 @@ public class Relation {
      *
      * @return the primary key (uniquely identifying) column
      */
-    public String getPrimaryKey() {
+    public String getPrimaryKey() { //Originally included
         return primaryKey;
     }
 
@@ -121,7 +121,7 @@ public class Relation {
      *
      * @return the list of column definitions
      */
-    public List<Attribute> getColumns() {
+    public List<Attribute> getColumns() { //Originally included
         return columns;
     }
 
@@ -130,7 +130,7 @@ public class Relation {
      *
      * @return the list of records
      */
-    public List<Tuple> getRecords() {
+    public List<Tuple> getRecords() { //Originally included
         return records;
     }
 
@@ -141,7 +141,7 @@ public class Relation {
      * @return the matching Attribute object
      * @throws IllegalArgumentException if the column does not exist
      */
-    public Attribute getAttribute(String columnName) {
+    public Attribute getAttribute(String columnName) { //Originally included
         for (Attribute attr : columns) {
             if (attr.getName().equals(columnName)) {
                 return attr;

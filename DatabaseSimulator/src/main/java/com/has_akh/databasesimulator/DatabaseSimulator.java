@@ -20,19 +20,19 @@ import java.util.Scanner;
  */
 public class DatabaseSimulator {
 
-    static String[] menu;
-    static int choice;
-    static Scanner keyboard;
-    static Database thisDB;
-    static Relation currentTable;
+    static String[] menu; //Originally included
+    static int choice; //Originally included
+    static Scanner keyboard; //Originally included
+    static Database thisDB; //Originally included
+    static Relation currentTable; //Originally included
 
-    public static void displayMenu() {
+    public static void displayMenu() { //Originally included
         for (String menuItem : menu) {
             System.out.println(menuItem);
         }
     }
 
-    public static boolean runSimulator() {
+    public static boolean runSimulator() { //Originally included
         displayMenu();
         System.out.println("Enter your choice:");
         do {
@@ -48,7 +48,7 @@ public class DatabaseSimulator {
         return choice == menu.length;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) { //Originally included
         menu = new String[]{
             "1. Create Database",
             "2. Load Database",
@@ -70,7 +70,7 @@ public class DatabaseSimulator {
         System.out.println("Thanks for using the Database Simulator (by Hasan Akhtar).");
     }
 
-    public static void handleChoice() {
+    public static void handleChoice() { //Originally included
         StorageManager storageForThisDB;
         List<Attribute> schema;
         switch (choice) {
@@ -249,7 +249,7 @@ public class DatabaseSimulator {
         }
     }
     
-    private static String tryDropOtherTable() {
+    private static String tryDropOtherTable() { //Not included originally
         String tableToDrop;
         try {
             System.out.println("Enter the name of the table to drop: ");
@@ -268,7 +268,7 @@ public class DatabaseSimulator {
      * @param type the expected data type
      * @return the parsed value as an Object
      */
-    private static Object parseValue(String raw, DataType type) {
+    private static Object parseValue(String raw, DataType type) { //Not included originally
         return switch (type) {
             case INTEGER -> Integer.parseInt(raw);
             case FLOAT -> Float.parseFloat(raw);
@@ -286,7 +286,7 @@ public class DatabaseSimulator {
      * @return the matching DataType enum value
      * @throws IllegalArgumentException if the string does not match any known type
      */
-    public static DataType toDataType(String typeString) {
+    public static DataType toDataType(String typeString) { //Not included originally
         if (typeString == null || typeString.isBlank()) {
             throw new IllegalArgumentException("Column type cannot be empty.");
         }

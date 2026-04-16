@@ -16,9 +16,9 @@ package com.has_akh.databasesimulator;
  * 
  * @author Hasan Akhtar
  */
-class Attribute {
-    private String name;
-    private DataType type;
+public class Attribute {
+    private String name; //Originally included
+    private DataType type; //Originally included
 
     /**
      * Constructs a new Attribute with the specified name and data type.
@@ -26,7 +26,7 @@ class Attribute {
      * @param name the name of the attribute (column name)
      * @param type the data type associated with this attribute
      */
-    public Attribute(String name, DataType type) {
+    public Attribute(String name, DataType type) { //Originally included
         this.name = name;
         this.type = type;
     }
@@ -36,7 +36,7 @@ class Attribute {
      *
      * @param newName the new name to assign to the attribute
      */
-    public void setName(String newName) {
+    public void setName(String newName) { //Originally included
         this.name = newName;
     }
 
@@ -45,7 +45,7 @@ class Attribute {
      *
      * @return the attribute's name
      */
-    public String getName() {
+    public String getName() { //Originally included
         return this.name;
     }
 
@@ -54,7 +54,7 @@ class Attribute {
      *
      * @param newType the new data type to assign to the attribute
      */
-    public void setType(DataType newType) {
+    public void setType(DataType newType) { //Originally included
         this.type = newType;
     }
 
@@ -63,7 +63,7 @@ class Attribute {
      *
      * @return the attribute's data type
      */
-    public DataType getType() {
+    public DataType getType() { //Originally included
         return this.type;
     }
 }
